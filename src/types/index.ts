@@ -40,11 +40,31 @@ export type LoginType = {
   password: string;
 };
 
+export type PollType = {
+  userId: any;
+  title: string;
+  description: string;
+  isPublic?: boolean;
+  expiresAt?: Date;
+  options: any[];
+};
+
 // =============== Output Types ================
 export type UserRes = {
   id: string;
   name: string;
   email: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type PollRes = {
+  id: string;
+  title: string;
+  description: string;
+  isPublic: boolean;
+  expiresAt: Date;
+  options: string[];
   createdAt?: Date;
   updatedAt?: Date;
 };

@@ -1,3 +1,4 @@
 import AuthController from "./auth.controller";
+import PollController from "./poll.controller";
 
-export { AuthController };
+export { AuthController, PollController };

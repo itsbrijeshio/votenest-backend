@@ -27,3 +27,55 @@ GET {{BASE_URL}}/auth/me
 
 ### GET - /auth/logout
 GET {{BASE_URL}}/auth/logout
+
+### POST - /polls
+POST {{BASE_URL}}/polls
+Content-Type: application/json
+
+{
+  "title": "Which Genre Do You Watch the Most?",
+  "description": "When you're in the mood to watch something, what genre do you usually pick?",
+ "options": ["Comedy", "Action", "Drama", "Documentary", "Sci-Fi"]
+  }
+
+
+### GET - /polls
+GET {{BASE_URL}}/polls
+
+### GET - /polls/:pollId
+GET {{BASE_URL}}/polls/49747e75-c0d7-432a-b36e-d021d52580f0
+
+### PATCH - /polls
+PATCH {{BASE_URL}}/polls/0c98f4bf-8746-4ffb-b79e-aadccdfe718e
+Content-Type: application/json
+
+{
+  "title": "Which Genre Do You Watch the Most?",
+  "description": "When you're in the mood to watch something, what genre do you usually pick?",
+  "options": ["Bold", "Action", "Drama", "Documentary", "Sci-Fi"]
+  }
+
+### DELETE - /polls/:pollId
+DELETE {{BASE_URL}}/polls/0c98f4bf-8746-4ffb-b79e-aadccdfe718e
+
+### GET - /polls/public
+GET {{BASE_URL}}/polls/public
+
+### GET - /polls/public/:pollId
+GET {{BASE_URL}}/polls/public/49747e75-c0d7-432a-b36e-d021d52580f0
+
+### POST - /polls/vote/:pollId
+POST {{BASE_URL}}/polls/vote/49747e75-c0d7-432a-b36e-d021d52580f0
+Content-Type: application/json
+
+{
+  "optionId": "65c4e494-391a-4ecd-9262-8f6252421268"
+}
+
+### POST - /polls/public/vote/:pollId
+POST {{BASE_URL}}/polls/public/vote/49747e75-c0d7-432a-b36e-d021d52580f0
+Content-Type: application/json
+
+{
+  "optionId": "65c4e494-391a-4ecd-9262-8f6252421268"
+}
