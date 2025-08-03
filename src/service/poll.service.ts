@@ -3,8 +3,10 @@ import { PollRes, PollType } from "../types";
 import { ApiError } from "../utils";
 
 interface QueryProps {
+  query: string;
   page: number;
   limit: number;
+  isPublic?: boolean | null;
 }
 
 class PollService {
@@ -52,11 +54,32 @@ class PollService {
 
   public getPolls = async (
     userId: any,
-    { page, limit }: QueryProps
+    { query, page, limit, isPublic }: QueryProps
   ): Promise<PollRes[]> => {
     const skip = (page - 1) * limit;
+    const search = ["title", "description"]?.map((s: string) => ({
+      [s]: { contains: query },
+    }));
+    const options: any = {};
+    if (typeof isPublic == "boolean") {
+      options.isPublic = isPublic;
+    }
+
     const polls = await this.prisma.poll.findMany({
-      where: { userId },
+      where: {
+        ...options,
+        userId,
+        AND: [
+          {
+            OR: [
+              { expiresAt: null }, // Poll without expiration date
+            ],
+          },
+          {
+            OR: search,
+          },
+        ],
+      },
       include: { options: false, user: false, _count: true },
       skip,
       take: limit,
@@ -112,6 +135,9 @@ class PollService {
     userId: string,
     pollId: string
   ): Promise<PollRes> => {
+    await this.getById(userId, pollId);
+    await this.prisma.vote.deleteMany({ where: { pollId } });
+    await this.prisma.option.deleteMany({ where: { pollId } });
     const deletedPoll = await this.prisma.poll.delete({
       where: { userId, id: pollId },
       include: { options: true },
@@ -126,12 +152,29 @@ class PollService {
     return this.sanitize(deletedPoll);
   };
 
-  public getPublicPolls = async ({ page, limit }: QueryProps): Promise<any> => {
+  public getPublicPolls = async ({
+    query,
+    page,
+    limit,
+  }: QueryProps): Promise<any> => {
     const skip = (page - 1) * limit;
+    const search = ["title", "description"]?.map((s: string) => ({
+      [s]: { contains: query },
+    }));
     const polls = await this.prisma.poll.findMany({
       where: {
         isPublic: true,
-        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        AND: [
+          {
+            OR: [
+              { expiresAt: null }, // Poll without expiration date
+              { expiresAt: { gt: new Date() } }, // Poll that hasn't expired yet
+            ],
+          },
+          {
+            OR: search,
+          },
+        ],
       },
       include: { options: false, _count: true },
       skip,

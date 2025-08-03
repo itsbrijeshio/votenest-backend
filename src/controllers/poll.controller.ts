@@ -7,7 +7,9 @@ const queries = (query: any) => {
   let limit = parseInt(query.limit) || 20;
   if (page < 1 || page > 100) page = 1;
   if (limit < 5 || limit > 30) limit = 20;
-  return { page, limit };
+  const isPublic =
+    query?.public == "true" ? true : query?.public == "false" ? false : null;
+  return { query: query?.query || "", page, limit, isPublic };
 };
 
 class PollController extends PollService {
