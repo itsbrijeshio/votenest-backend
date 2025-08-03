@@ -2,6 +2,14 @@ import { Request, Response } from "express";
 import { PollService } from "../service";
 import { response, signCookie } from "../utils";
 
+const queries = (query: any) => {
+  let page = parseInt(query.page) || 1;
+  let limit = parseInt(query.limit) || 20;
+  if (page < 1 || page > 100) page = 1;
+  if (limit < 5 || limit > 30) limit = 20;
+  return { page, limit };
+};
+
 class PollController extends PollService {
   constructor() {
     super();
@@ -15,7 +23,7 @@ class PollController extends PollService {
 
   handleGetPolls = async (req: Request, res: Response) => {
     const { id } = req.auth;
-    const polls = await this.getPolls(id);
+    const polls = await this.getPolls(id, queries(req.query));
     response(res, 200, polls);
   };
 
@@ -38,7 +46,7 @@ class PollController extends PollService {
   };
 
   handleGetPublicPolls = async (req: Request, res: Response) => {
-    const polls = await this.getPublicPolls();
+    const polls = await this.getPublicPolls(queries(req.query));
     response(res, 200, polls);
   };
 

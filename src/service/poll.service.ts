@@ -2,6 +2,11 @@ import prisma from "../config/prisma";
 import { PollRes, PollType } from "../types";
 import { ApiError } from "../utils";
 
+interface QueryProps {
+  page: number;
+  limit: number;
+}
+
 class PollService {
   private prisma = prisma;
 
@@ -45,10 +50,16 @@ class PollService {
     return this.sanitize(newPoll);
   };
 
-  public getPolls = async (userId: any): Promise<PollRes[]> => {
+  public getPolls = async (
+    userId: any,
+    { page, limit }: QueryProps
+  ): Promise<PollRes[]> => {
+    const skip = (page - 1) * limit;
     const polls = await this.prisma.poll.findMany({
       where: { userId },
-      include: { options: false, user: false },
+      include: { options: false, user: false, _count: true },
+      skip,
+      take: limit,
     });
     return polls.map(this.sanitize);
   };
@@ -115,15 +126,16 @@ class PollService {
     return this.sanitize(deletedPoll);
   };
 
-  public getPublicPolls = async (): Promise<any> => {
+  public getPublicPolls = async ({ page, limit }: QueryProps): Promise<any> => {
+    const skip = (page - 1) * limit;
     const polls = await this.prisma.poll.findMany({
       where: {
         isPublic: true,
         OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       include: { options: false, _count: true },
-      skip: 0,
-      take: 40,
+      skip,
+      take: limit,
       orderBy: {
         createdAt: "desc",
       },
