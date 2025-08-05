@@ -1,0 +1,32 @@
+@BASE_URL = http://localhost:3000
+@BASE_URL_AUTH = http://localhost:3000/api/auth
+
+
+### GET - default endpoint
+GET {{BASE_URL}}
+
+# Auth endpoints
+### POST - create new user 
+POST {{BASE_URL_AUTH}}/register
+Content-Type: application/json
+
+{
+  "name": "Sine",
+  "email": "sine@duck.com",
+  "password": "12345678"
+}
+
+### POST - login user
+POST {{BASE_URL_AUTH}}/login
+Content-Type: application/json
+
+{
+  "email": "sine@duck.com",
+  "password": "12345678"
+}
+
+### GET - get logged in user
+GET {{BASE_URL_AUTH}}/me
+
+### GET - logout logged in user
+GET {{BASE_URL_AUTH}}/logout
