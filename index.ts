@@ -1,10 +1,7 @@
-import { config } from "dotenv";
-config();
-
+import { connectDB, env } from "./src/config";
 import app from "./src/app";
-import { connectDB } from "./src/config";
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 connectDB().then(() => {
   app.listen(PORT, () => {

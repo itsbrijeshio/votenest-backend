@@ -1,6 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { ZodError, ZodIssue } from "zod";
 import { ApiError, logger } from "../utils";
+import { env } from "../config";
 
 const formatZodError = (zodError: ZodError) => {
   const messageArr = zodError.issues?.map((issue: ZodIssue) => ({
@@ -44,7 +45,7 @@ const errorMiddleware: ErrorRequestHandler = (
   const error = {
     type: "INTERNAL_SERVER",
     message:
-      process.env.NODE_ENV === "development"
+      env.NODE_ENV === "development"
         ? err.toString()
         : "Something went wrong",
   };

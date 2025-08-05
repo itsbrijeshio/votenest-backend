@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils";
 import { NextFunction, Request, Response } from "express";
+import { env } from "../config";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = env.JWT_SECRET;
 
 interface JwtResponse {
   _id: string;
