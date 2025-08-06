@@ -1,7 +1,9 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { ZodError, ZodIssue } from "zod";
 import { ApiError, logger } from "../utils";
-import { env } from "../config";
+import { serverMsg } from "../constants";
+import { ErrorInput } from "../types";
+import { MongooseError } from "mongoose";
 
 const formatZodError = (zodError: ZodError) => {
   const messageArr = zodError.issues?.map((issue: ZodIssue) => ({
@@ -11,7 +13,11 @@ const formatZodError = (zodError: ZodError) => {
   return messageArr;
 };
 
-const sendErrorResponse = <T>(res: Response, status: number, error: T) => {
+const sendErrorResponse = <T>(
+  res: Response,
+  status: number,
+  error: ErrorInput<T>
+) => {
   return res.status(status).json({
     success: false,
     status,
@@ -31,25 +37,28 @@ const errorMiddleware: ErrorRequestHandler = (
   }
 
   if (err instanceof ZodError) {
-    const error = {
-      type: "VALIDATION",
+    return sendErrorResponse(res, 400, {
+      type: "BAD_REQUEST",
       details: formatZodError(err),
-    };
-    return sendErrorResponse(res, 400, error);
+    });
+  }
+
+  if (err instanceof MongooseError) {
+    return sendErrorResponse(res, 500, {
+      type: "INTERNAL_SERVER_ERROR",
+      message: serverMsg.MONGO_ERROR,
+    });
   }
 
   logger.error(
     `[${req.method}] ${req.path} - ${err instanceof Error ? err.stack : err}`
   );
 
-  const error = {
-    type: "INTERNAL_SERVER",
-    message:
-      env.NODE_ENV === "development"
-        ? err.toString()
-        : "Something went wrong",
-  };
-  return sendErrorResponse(res, 500, error);
+  const message = serverMsg.INTERNAL_SERVER_ERROR;
+  return sendErrorResponse(res, 500, {
+    type: "INTERNAL_SERVER_ERROR",
+    message,
+  });
 };
 
 export default errorMiddleware;

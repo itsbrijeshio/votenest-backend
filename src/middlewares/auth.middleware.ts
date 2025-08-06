@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { ApiError } from "../utils";
 import { NextFunction, Request, Response } from "express";
 import { env } from "../config";
+import { userMsg } from "../constants";
 
 const JWT_SECRET = env.JWT_SECRET;
 
@@ -10,9 +11,7 @@ interface JwtResponse {
 }
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const headerToken = Array.isArray(req.headers?.["x-access-token"])
-    ? req.headers["x-access-token"][0]
-    : req.headers?.["x-access-token"];
+  const headerToken = req.headers?.authorization?.split(" ")[1];
 
   const token = headerToken?.toString();
   const accessToken = req.cookies?.["token"] || token;
@@ -22,7 +21,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       throw new ApiError({
         type: "UNAUTHORIZED",
         status: 401,
-        message: "You are not logged in.",
+        message: userMsg.NOT_LOGGED_IN,
       });
     }
 
@@ -33,7 +32,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       throw new ApiError({
         type: "UNAUTHORIZED",
         status: 401,
-        message: "Your session has expired. Please log in again.",
+        message: userMsg.TOKEN_INVALID,
       });
     }
     next();
@@ -41,7 +40,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     throw new ApiError({
       type: "UNAUTHORIZED",
       status: 401,
-      message: "You are not logged in.",
+      message: userMsg.TOKEN_INVALID,
     });
   }
 };

@@ -1,5 +1,7 @@
 @BASE_URL = http://localhost:3000
 @BASE_URL_AUTH = http://localhost:3000/api/auth
+@BASE_URL_POLL = http://localhost:3000/api/polls
+
 
 
 ### GET - default endpoint
@@ -30,3 +32,57 @@ GET {{BASE_URL_AUTH}}/me
 
 ### GET - logout logged in user
 GET {{BASE_URL_AUTH}}/logout
+
+
+# Poll endpoints
+### POST - create new poll
+POST {{BASE_URL_POLL}}/
+Content-Type: application/json
+
+{
+  "question": "What’s your go-to programming language in 2025?",
+  "description": "Based on your current projects, which language do you use the most?",
+  "options":[
+    "Python",
+    "JavaScript/TypeScript",
+    "Java",
+    "Rust",
+    "GO",
+    "C/C++"
+  ]
+}
+
+### GET - get all polls
+GET {{BASE_URL_POLL}}
+
+### GET - get poll by id
+GET {{BASE_URL_POLL}}/68935f3ab5028095f4a5fb7b
+
+### POST - create new poll
+PATCH {{BASE_URL_POLL}}/6893043efec3e51c29819195
+Content-Type: application/json
+
+{
+"options":[
+    "The message property is properly optional"
+  ]
+}
+
+### DELETE - delete poll by id
+DELETE  {{BASE_URL_POLL}}/6893041de0deddec19ed0c87
+
+### POST - vote by ipAddress
+POST  {{BASE_URL_POLL}}/public/vote/68935f3ab5028095f4a5fb7b
+Content-Type: application/json
+
+{
+  "optionId": "68935f3ab5028095f4a5fb7f"
+}
+
+### POST - vote by user
+POST  {{BASE_URL_POLL}}/private/vote/68935f3ab5028095f4a5fb7b
+Content-Type: application/json
+
+{
+  "optionId": "68935f3ab5028095f4a5fb7f"
+}

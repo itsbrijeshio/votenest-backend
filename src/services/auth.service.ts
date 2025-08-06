@@ -2,29 +2,15 @@ import argon2 from "argon2";
 import { Document } from "mongoose";
 import { User } from "../models";
 import { ApiError } from "../utils";
-
-export interface UserDocument extends Document {
-  _id: string;
-  password?: string;
-}
-
-interface RegisterPayload {
-  name: string;
-  email: string;
-  password: string;
-}
-
-interface LoginPayload {
-  email: string;
-  password: string;
-}
+import { userMsg } from "../constants";
+import { IUser, LoginPayload, RegisterPayload } from "../types";
 
 class AuthService {
   private user = User;
 
-  private sanitize = (user: Document): UserDocument => {
+  private sanitize = (user: Document): IUser => {
     const { password, polls, __v, ...sanitizedUser } = user?.toJSON?.() || user;
-    return sanitizedUser as UserDocument;
+    return sanitizedUser as IUser;
   };
 
   private hashPassword = async (password: string): Promise<string> => {
@@ -44,26 +30,26 @@ class AuthService {
       throw new ApiError({
         status: 409,
         type: "CONFLICT",
-        message: "Email already exists.",
+        message: userMsg.CONFLICT,
       });
     }
     return !!user;
   };
 
-  public register = async (data: RegisterPayload): Promise<UserDocument> => {
+  public register = async (data: RegisterPayload): Promise<IUser> => {
     await this.isEmailUnique(data.email);
     data.password = await this.hashPassword(data.password);
     const user = await this.user.create(data);
     return this.sanitize(user);
   };
 
-  public login = async (data: LoginPayload): Promise<UserDocument> => {
+  public login = async (data: LoginPayload): Promise<IUser> => {
     const user = await this.user.findOne({ email: data.email });
     if (!user) {
       throw new ApiError({
-        status: 400,
-        type: "BAD_REQUEST",
-        message: "Invalid credentials",
+        status: 404,
+        type: "NOT_FOUND",
+        message: userMsg.NOT_FOUND,
       });
     }
 
@@ -73,22 +59,22 @@ class AuthService {
     );
     if (!isPasswordValid) {
       throw new ApiError({
-        status: 400,
-        type: "BAD_REQUEST",
-        message: "Invalid credentials",
+        status: 404,
+        type: "NOT_FOUND",
+        message: userMsg.NOT_FOUND,
       });
     }
 
     return this.sanitize(user);
   };
 
-  public getUser = async (id: string): Promise<UserDocument> => {
+  public getUser = async (id: string): Promise<IUser> => {
     const user = await this.user.findById(id);
     if (!user) {
       throw new ApiError({
         status: 401,
         type: "UNAUTHORIZED",
-        message: "Authentication failed",
+        message: userMsg.UNAUTHORIZED,
       });
     }
     return this.sanitize(user);

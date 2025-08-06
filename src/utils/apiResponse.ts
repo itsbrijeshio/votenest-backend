@@ -1,7 +1,6 @@
 import { Response } from "express";
-import { UserDocument } from "../services/auth.service";
 
-interface ApiResponseData extends UserDocument {
+interface ApiMessage {
   message?: string;
 }
 
@@ -9,16 +8,16 @@ interface ApiResponseOptions {
   [key: string]: unknown;
 }
 
-const apiResponse = (
+const apiResponse = <T>(
   res: Response,
-  statusCode: number,
-  data: ApiResponseData | null = null,
+  status: number,
+  data: T | null = null,
   rest: ApiResponseOptions | null = {}
 ): Response => {
-  const message = data?.message || "Success";
-  return res.status(statusCode).json({
+  const message = "Success";
+  return res.status(status).json({
     success: true,
-    statusCode,
+    status,
     message,
     data,
     ...rest,
