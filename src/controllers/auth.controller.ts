@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services";
 import { apiResponse, signCookie } from "../utils";
+import { env } from "../config";
 
 class AuthController extends AuthService {
   constructor() {
@@ -19,7 +20,12 @@ class AuthController extends AuthService {
   };
 
   handleLogout = (req: Request, res: Response) => {
-    res.clearCookie("token");
+    const production = env.NODE_ENV == "production";
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: production,
+      sameSite: production ? "none" : "lax",
+    });
     apiResponse(res, 200);
   };
 

@@ -21,9 +21,9 @@ router.post(
   validated(createPollSchema),
   pollController.handleCreate
 );
+router.get("/private", authenticated, pollController.handleFindPrivateAll);
 router.get("/:pollId", validateId, pollController.handleFindOne);
 router.get("/", pollController.handleFindAll);
-router.get("/private", authenticated, pollController.handleFindPrivateAll);
 router.patch(
   "/:pollId",
   authenticated,

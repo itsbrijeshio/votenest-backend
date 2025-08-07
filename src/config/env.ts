@@ -7,6 +7,7 @@ const env = {
   PORT: process.env.PORT as string,
   MONGO_URI: process.env.MONGO_URI as string,
   JWT_SECRET: process.env.JWT_SECRET as string,
+  FRONTEND_URL: process.env.FRONTEND_URL as string,
 };
 
 export default env;

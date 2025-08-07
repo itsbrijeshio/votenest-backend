@@ -3,7 +3,7 @@
   "editor.fontFamily": "'JetBrains Mono', Consolas, monospace",
   "editor.wordWrap": "wordWrapColumn",
   "editor.formatOnSave": true,
-  "workbench.colorTheme": "Mayukai Dark",
+  "workbench.colorTheme": "Mayukai Mono",
   "editor.mouseWheelZoom": true,
   "editor.formatOnPaste": true,
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true

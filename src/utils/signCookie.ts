@@ -9,9 +9,16 @@ const signCookie = (res: Response, userId: string) => {
     expiresIn: "3d",
   });
 
+  type SameSiteOption = "none" | "lax" | "strict";
+
+  const getSameSiteSetting = (): SameSiteOption => {
+    return env.NODE_ENV === "production" ? "none" : "lax";
+  };
+
   const httpOptions = {
     secure: env.NODE_ENV == "production", // Enable secure cookies for HTTPS
     httpOnly: true,
+    sameSite: getSameSiteSetting(),
   };
 
   res.cookie("token", token, httpOptions);
